@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <title>My Calculator</title>
+</head>
+
+<body>
+    <div class="cal-grid">
+        <div class="output">
+            <div data-previous-operand class="previous-grid"></div>
+            <div data-current-operand class="present-grid"></div>
+        </div>
+        <button data-all-clear class="span-two">AC</button>
+        <button data-delete>DEL</button>
+        <button data-operation>/</button>
+        <button data-number>1</button>
+        <button data-number>2</button>
+        <button data-number>3</button>
+        <button data-operation>*</button>
+        <button data-number>4</button>
+        <button data-number>5</button>
+        <button data-number>6</button>
+        <button data-operation>+</button>
+        <button data-number>7</button>
+        <button data-number>8</button>
+        <button data-number>9</button>
+        <button data-operation>-</button>
+        <button data-number>.</button>
+        <button data-number>0</button>
+        <button data-equals class="span-two">=</button>
+    </div>
+    <script>
+
+        class Calculator {
+            constructor(DataPreviousOperand, DataCurrentOperand) {
+                this.DataPreviousOperand = DataPreviousOperand
+                this.DataCurrentOperand = DataCurrentOperand
+                this.clear()
+            }
+            clear() {
+                this.currentOperand = ''
+                this.previousOperand = ''
+                this.operation = undefined
+                this.DataPreviousOperand.innerText = ''
+            }
+            delete() {
+                this.currentOperand = this.currentOperand.toString().slice(0, -1)
+            }
+            appendNumber(number) {
+                if (number == '.' && this.currentOperand.includes('.')) return
+                this.currentOperand = this.currentOperand.toString() + number.toString()
+            }
+            chooseOperation(operation) {
+                if (this.currentOperand == '') return
+                if (this.previousOperand != '') {
+                    this.compute()
+                }
+                this.operation = operation
+                this.previousOperand = this.currentOperand
+                this.currentOperand = ''
+            }
+            compute() {
+                let computation
+                const pre = parseFloat(this.previousOperand)
+                const cur = parseFloat(this.currentOperand)
+                if (isNaN(pre) || isNaN(cur)) return
+                switch (this.operation) {
+                    case '+':
+                        computation = pre + cur
+                        break
+                    case '-':
+                        computation = pre - cur
+                        break
+                    case '*':
+                        computation = pre * cur
+                        break
+                    case '/':
+                        computation = pre / cur
+                        break
+                    default:
+                        return;
+                }
+                this.currentOperand = computation;
+                this.operation = undefined
+                this.previousOperand = ''
+            }
+            // getdisplaynumber(number) {
+            //     const floatNumber = parseFloat(number)
+            //     if (isNaN(floatNumber)) return ''
+            //     return floatNumber.toLocaleString('en')
+            // }
+            updateDisplay() {
+                this.DataCurrentOperand.innerText = this.currentOperand
+
+                if (this.operation != null) {
+                    this.DataPreviousOperand.innerText = `${this.previousOperand} ${this.operation}`
+                }
+            }
+        }
+
+
+        const DataNumber = document.querySelectorAll('[data-number]')
+        const DataOperation = document.querySelectorAll('[data-operation]')
+        const AllClear = document.querySelector('[data-all-clear]')
+        const DataDelete = document.querySelector('[data-delete]')
+        const DataEqual = document.querySelector('[data-equals]')
+        const DataPreviousOperand = document.querySelector('[data-previous-operand]')
+        const DataCurrentOperand = document.querySelector('[data-current-operand]')
+
+
+        const calculator = new Calculator(DataPreviousOperand, DataCurrentOperand)
+
+        DataNumber.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.appendNumber(button.innerText)
+                calculator.updateDisplay()
+            })
+        })
+
+        DataOperation.forEach(button => {
+            button.addEventListener('click', () => {
+                calculator.chooseOperation(button.innerText)
+                calculator.updateDisplay()
+            })
+        })
+
+        DataEqual.addEventListener('click', button => {
+            calculator.compute()
+            calculator.updateDisplay()
+        })
+        AllClear.addEventListener('click', button => {
+            calculator.clear()
+            calculator.updateDisplay()
+        })
+
+        DataDelete.addEventListener('click', button => {
+            calculator.delete()
+            calculator.updateDisplay()
+        })
+    </script>
+</body>
+
+</html>
